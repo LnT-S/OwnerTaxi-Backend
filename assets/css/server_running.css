@@ -1,0 +1,44 @@
+.text {
+  font-size: 44px;
+  position: relative;
+  bottom: 10px;
+  color: green;
+}
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Adjust to the desired height */
+}
+
+.loader {
+  display: flex;
+  color: green;
+}
+
+.dot {
+  border-color: red;
+  width: 7px;
+  height: 7px;
+  margin: 0 5px;
+  background-color: green;
+  border-radius: 50%;
+  animation: dot-animation 2s infinite ease-in-out;
+}
+
+@keyframes dot-animation {
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+    background-color: green;
+  }
+ 40% {
+    background-color: red;
+    transform: scale(1);
+  }
+ 80% {
+    background-color: green;
+    transform: scale(1);
+  }
+}
