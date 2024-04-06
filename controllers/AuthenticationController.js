@@ -1,4 +1,3 @@
-import twilio from 'twilio'
 export const getOtp = async function(req,res){
     console.log('API :  /authentication/get-otp' , req.body)
 
