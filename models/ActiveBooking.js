@@ -1,6 +1,10 @@
 import mongoose from 'mongoose'
 
 const activeBookingSchema = new mongoose.Schema({
+    authenticationId : {
+        type : mongoose.Schema.Types.ObjectId,
+        ref : 'Authentication'
+    },
     passiveBookingId : {
         type : mongoose.Schema.Types.ObjectId,
         ref : 'PassiveBooking'

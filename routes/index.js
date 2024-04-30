@@ -1,4 +1,5 @@
 import express from 'express'
+import passport from 'passport'
 const router = express.Router()
 
 import authentication from './authentication/index.js'
@@ -12,7 +13,7 @@ router.get('/',(req,res)=>{
 })
 
 router.use('/authentication' , authentication)
-router.use('/customer' , customer)
+router.use('/customer',passport.authenticate('jwt',{session : false}) , customer)
 
 //VEHICLE INFO
 router.get('/vehicle-info',vehicleInfo)

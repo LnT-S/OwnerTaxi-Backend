@@ -1,14 +1,22 @@
 import mongoose from "mongoose";
+import multer from 'multer'
+import path from 'path'
+const __dirname = path.resolve(path.dirname(''));
+const AVATAR_PATH = path.join('/uploads/images');
+const DOCUMENT_PATH = path.join('/ouploads/documents')
 
 const authenticationSchema = new mongoose.Schema(
   {
     id: {
       type: Number,
-      unique: true,
     },
     phoneNo: {
       type: Number,
+      required : true,
       unique: true,
+    },
+    otp: {
+      type: String,
     },
     type: {
       type: String,
@@ -65,17 +73,43 @@ const authenticationSchema = new mongoose.Schema(
         },
       },
     ],
-    otp: {
-      type: Number,
-    },
     verification: {
       type: Boolean,
+      default : false
     },
   },
   {
     timestamps: true,
   }
 );
+
+try {
+  let imageStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, AVATAR_PATH))
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now();
+        cb(null, file.fieldname + '-' + uniqueSuffix)
+    }
+  })
+  let documentStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, DOCUMENT_PATH))
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now();
+        cb(null, file.fieldname + '-' + uniqueSuffix)
+    }
+  })
+  authenticationSchema.statics.uploadImage = multer({ storage: imageStorage }).single('avatar');
+  authenticationSchema.statics.uploadDocument = multer({ storage: imageStorage }).array('documents');
+  authenticationSchema.statics.avatarPath = AVATAR_PATH;
+  authenticationSchema.statics.documentPath = DOCUMENT_PATH;
+  
+} catch (error) {
+  console.log("ERROR IN MULTER CONFIGURATION ", error)
+}
 
 const Authentication = mongoose.model("Authentication", authenticationSchema);
 

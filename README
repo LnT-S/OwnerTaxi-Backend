@@ -1,0 +1,6 @@
+WELCOME TO THE SERVER OF OWNER TAXI 
+
+.env Variables
+
+#PORT :: <Number> //Will determine the port on which server will listen to http requests
+#MONGODB_URL :: <String> //MONGODB URL WHEN MONGODB IS HOSTED AND ACCESSIBLE FROM ANYWHERE (recommended MongoDb Atlas)

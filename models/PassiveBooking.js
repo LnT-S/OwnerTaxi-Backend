@@ -36,21 +36,9 @@ const passiveBookingSchema = new mongoose.Schema({
       },
       hour: {
         type: Number,
-        validator: {
-          validate: function (v) {
-            return v <= 23;
-          },
-        },
-        message: "Hour invalid input",
       },
       min: {
         type: Number,
-        validator: {
-          validate: function (v) {
-            return v <= 59;
-          },
-        },
-        message: "Minute invalid input",
       },
     },
   },
@@ -60,7 +48,7 @@ const passiveBookingSchema = new mongoose.Schema({
       required: true,
     },
     latitude: {
-      type: Number,
+      type: Number ,
     },
     longitude: {
       type: Number,
@@ -68,34 +56,27 @@ const passiveBookingSchema = new mongoose.Schema({
     date: {
       msec: {
         type: Number,
-        required: true,
+        default : new Date().getTime()
       },
       year: {
         type: Number,
+        default : new Date().getFullYear()
       },
       month: {
         type: Number,
+        default : new Date().getMonth()
       },
       day: {
         type: Number,
+        default : new Date().getDate()
       },
       hour: {
         type: Number,
-        validator: {
-          validate: function (v) {
-            return v <= 23;
-          },
-        },
-        message: "Hour invalid input",
+        default : new Date().getHours()
       },
       min: {
         type: Number,
-        validator: {
-          validate: function (v) {
-            return v <= 59;
-          },
-        },
-        message: "Minute invalid input",
+        default : new Date().getMinutes()
       },
     },
   },
@@ -108,7 +89,7 @@ const passiveBookingSchema = new mongoose.Schema({
   },
   bookingSubType: {
     type: String,
-    enum: ["oneway", "roundTrip"],
+    enum: ["","oneway", "roundTrip"],
   },
   vehicle: {
     type: {
@@ -166,7 +147,6 @@ const passiveBookingSchema = new mongoose.Schema({
     },
     phone : {
         type : Number,
-        max : 9999999999
     }
   }
 },{
