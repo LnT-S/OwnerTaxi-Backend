@@ -42,13 +42,46 @@ const passiveBookingSchema = new mongoose.Schema({
       },
     },
   },
+  stops: [
+    {
+      description: {
+        type: String,
+        required: true,
+      },
+      latitude: {
+        type: Number,
+      },
+      longitude: {
+        type: Number,
+      },
+      date: {
+        msec: {
+          type: Number,
+        },
+        year: {
+          type: Number,
+        },
+        month: {
+          type: Number,
+        },
+        day: {
+          type: Number,
+        },
+        hour: {
+          type: Number,
+        },
+        min: {
+          type: Number,
+        },
+      },
+    }
+  ],
   drop: {
     description: {
       type: String,
-      required: true,
     },
     latitude: {
-      type: Number ,
+      type: Number,
     },
     longitude: {
       type: Number,
@@ -56,27 +89,27 @@ const passiveBookingSchema = new mongoose.Schema({
     date: {
       msec: {
         type: Number,
-        default : new Date().getTime()
+        default: new Date().getTime()
       },
       year: {
         type: Number,
-        default : new Date().getFullYear()
+        default: new Date().getFullYear()
       },
       month: {
         type: Number,
-        default : new Date().getMonth()
+        default: new Date().getMonth()
       },
       day: {
         type: Number,
-        default : new Date().getDate()
+        default: new Date().getDate()
       },
       hour: {
         type: Number,
-        default : new Date().getHours()
+        default: new Date().getHours()
       },
       min: {
         type: Number,
-        default : new Date().getMinutes()
+        default: new Date().getMinutes()
       },
     },
   },
@@ -89,14 +122,14 @@ const passiveBookingSchema = new mongoose.Schema({
   },
   bookingSubType: {
     type: String,
-    enum: ["","oneway", "roundTrip"],
+    enum: ["", "oneway", "round trip"],
   },
   vehicle: {
     type: {
       type: String,
     },
-    subType : {
-      type : String
+    subType: {
+      type: String
     },
     capacity: {
       type: Number,
@@ -133,25 +166,25 @@ const passiveBookingSchema = new mongoose.Schema({
       },
     },
   },
-  status : {
-    type : String,
-    enum : ['accepted' , 'pending', 'closed']
+  status: {
+    type: String,
+    enum: ['accepted', 'pending', 'closed','bidstarted','cancelled']
   },
-  acceptor : {
-    id : {
-        type : mongoose.Schema.Types.ObjectId,
-        ref : 'Authentication'
+  acceptor: {
+    id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Authentication'
     },
-    budget : { 
-        type : Number,
+    budget: {
+      type: Number,
     },
-    phone : {
-        type : Number,
+    phone: {
+      type: Number,
     }
   }
-},{
-    timestamps : true
+}, {
+  timestamps: true
 });
 
-const PassiveBooking = mongoose.model('PassiveBooking',passiveBookingSchema)
+const PassiveBooking = mongoose.model('PassiveBooking', passiveBookingSchema)
 export default PassiveBooking
