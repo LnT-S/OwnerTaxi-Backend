@@ -81,24 +81,24 @@ export const getOtp = async function (req, res) {
     console.log("OTP TO BE SEND IS ", OTP)
 
 
-    // try {
-    //     const response = await axios.get(URL);
-    //     console.log('RESPONSE IS ', response.data)
-    //     if (response.status === 200) {
-    //         return res.status(200).json({
-    //             message: 'OTP sent successfully'
-    //         })
-    //     }else{
-    //         throw Error("AXIOS CALL ERROR",response?.error)
-    //     }
+    try {
+        const response = await axios.get(URL);
+        console.log('RESPONSE IS ', response.data)
+        if (response.status === 200) {
+            return res.status(200).json({
+                message: 'OTP sent successfully'
+            })
+        }else{
+            throw Error("AXIOS CALL ERROR",response?.error)
+        }
 
-    // } catch (error) {
-    //     console.error(error);
-    //     res.status(500).send('Internal Server Error');
-    // }
-    return res.status(200).json({
-        message: 'OTP sent successfully'
-    })
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+    // return res.status(200).json({
+    //     message: 'OTP sent successfully'
+    // })
 
 }
 
