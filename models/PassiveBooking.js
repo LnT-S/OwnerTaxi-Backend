@@ -138,33 +138,13 @@ const passiveBookingSchema = new mongoose.Schema({
   extrasIncluded: {
     type: Boolean,
   },
-  package: {
-    costPerKm: {
-      type: Number,
+  IRPackage: {
+    extraDistance : {
+      type : String
     },
-    costPerHour: {
-      type: Number,
-    },
-    distance: {
-      type: Number,
-    },
-    hours: {
-      type: Number,
-    },
-    extra: {
-      costPerKm: {
-        type: Number,
-      },
-      costPerHour: {
-        type: Number,
-      },
-      distance: {
-        type: Number,
-      },
-      hours: {
-        type: Number,
-      },
-    },
+    extraTime : { 
+      type : String
+    }
   },
   status: {
     type: String,

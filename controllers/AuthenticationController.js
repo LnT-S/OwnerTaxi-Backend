@@ -7,6 +7,7 @@ import Authentication from '../models/Authentication.js'
 import PassiveBooking from "../models/PassiveBooking.js";
 import ActiveBooking from "../models/ActiveBooking.js";
 import jwt from "jsonwebtoken";
+import Requirement from "../models/Requirement.js";
 
 export const getOtp = async function (req, res) {
     console.log('API :  /authentication/get-otp', req.body)
@@ -21,24 +22,63 @@ export const getOtp = async function (req, res) {
     setGlobalDispatcher(new Agent({ connect: { timeout: 60000 } }))
 
     let URL = `https://bulksms.smsroot.com/app/smsapi/index.php?key=${API_KEY}&campaign=0&contacts=${contacts}&senderid=OwnerT&msg=Your OTP is ${OTP} for Owner Taxi login, Do not share with anyone. Regards Owner Taxi"&routeid=13&template_id=${template_id}`;
-    console.log("OTP TO BE SEND IS ", OTP)
+
 
     let user = await Authentication.findOne({ phoneNo })
+    let docs = []
+    let temp;
     if (!user) {
+        if (type === 'driver') {
+            let requiredArray = await Requirement.aggregate([
+                // Deconstruct the array field
+                { $unwind: "$documentsList" },
+                // Match documents where field1 is 'aman'
+                { $match: { "documentsList.documentFor": "Driver" } },
+                // Group by field1 and count occurrences
+                {
+                    $group: {
+                        _id: null,
+                        vehicleDocuments: { $push: "$documentsList" }
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        vehicleDocuments: {
+                            $map: {
+                                input: "$vehicleDocuments",
+                                as: "obj",
+                                in: { documentFor: "$$obj.documentFor", documentName: "$$obj.documentName" } // Exclude _id field
+                            }
+                        }
+                    }
+                }
+            ]);
+
+            requiredArray[0]?.vehicleDocuments?.forEach(ele => {
+                temp = { ...ele, status: 'Missing', image: '', documentNo: '' }
+                docs.push(temp)
+            })
+            console.log("REQUIRED FOUNND ", docs);
+        }
         await Authentication.create({
             phoneNo: phoneNo,
             otp: OTP.toString(),
-            type
+            type,
+            shouldHaveVehicle: (type === 'driver' || type === 'vendor') ? true : false,
+            userDocument: docs
         })
     } else {
-        if(user.type!==type){
+        if (user.type !== type) {
+            console.log("This Number is already in use ")
             return res.status(400).json({
-                message : "This Number is already in use"
+                message: "This Number is already in use"
             })
         }
         user.otp = OTP.toString();
         await user.save()
     }
+    console.log("OTP TO BE SEND IS ", OTP)
 
 
     // try {
