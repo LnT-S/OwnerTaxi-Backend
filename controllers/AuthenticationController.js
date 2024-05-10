@@ -107,6 +107,7 @@ export const getOtp = async function (req, res) {
         console.error(error);
         res.status(500).json({message : 'Internal Server Error'});
     }
+    console.log("OTP TO BE SEND IS ", OTP)
 
 }
 export const verifyOtp = async (req, res) => {

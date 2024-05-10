@@ -62,7 +62,7 @@ const authenticationSchema = new mongoose.Schema(
             documentFor: {
               type: String,
             },
-            documentNo: {
+            status: {
               type: String,
             },
             image: {
