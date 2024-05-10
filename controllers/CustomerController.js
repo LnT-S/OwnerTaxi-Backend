@@ -66,6 +66,7 @@ export const editProfileInfo = async (req, res) => {
             }
             console.log("FILES \n", req.file);
             const { name, email } = req.body
+            console.log("NAME , EMAIL ",name,email);
             let user = await  Authentication.findById(req.user._id)
             if (name && name !== user.name) {
                 user.name = name
@@ -82,6 +83,7 @@ export const editProfileInfo = async (req, res) => {
                 user.avatar = path.join(Authentication.avatarPath, req?.file?.filename)
             }
             console.log("FINAL USER ",user)
+            await user.save()
             Authentication.findByIdAndUpdate(user._id, user , {new : true })
                 .then(upUser => {
                     console.log("UPDATED PROFILE ", upUser)

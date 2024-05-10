@@ -102,6 +102,10 @@ const authenticationSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+    requestToDelete : {
+      type : Boolean,
+      default : false
+    }
   },
   {
     timestamps: true,

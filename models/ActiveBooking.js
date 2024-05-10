@@ -25,6 +25,12 @@ const activeBookingSchema = new mongoose.Schema({
             },
             rating : {
                 type : Number,
+            },
+            name : {
+                type : String
+            },
+            image : {
+                type : String
             }
         }
     ]

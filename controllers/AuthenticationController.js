@@ -155,3 +155,18 @@ export const deleteAccount = async (req, res) => {
         })
     }
 }
+export const deleteAccountLink = async (req, res) => {
+    console.log('/authentication/request-to-delete/:phoneNo');
+    try {
+        console.log(("PARAMS", req.params));
+        const phoneNo = req.params
+        return res.status(200).json({
+            message : 'Your Request has been accepted. Your account will deleted within 7 days in case of no activity. Make Sure You donot login to your account'
+        })
+    } catch (error) {
+        console.log("ERROR CLEARING ACCOUNT ", error)
+        return res.status(400).json({
+            message: 'Internal Server Error'
+        })
+    }
+}

@@ -304,7 +304,9 @@ export const acceptIntercityBooking = async (req, res) => {
                     driverPhone: acceptor.phoneNo,
                     driverId: acceptorId,
                     budget: booking.budget,
-                    rating: acceptor.rating
+                    rating: acceptor.rating,
+                    name : acceptor.name,
+                    image : acceptor.avatar
                 }
             }
         }, {
@@ -397,6 +399,7 @@ export const getBookingsDriverHasAccepted = async (req, res) => {
                 path: 'authenticationId',
                 select: 'phoneNo -_id'
             })
+            .sort({createdAt : -1})
         console.log('Bookings ', result);
         return res.status(200).json({
             message: 'List of Bookings You have Accepted',
@@ -420,6 +423,7 @@ export const getBookingsDriverHasPosted = async (req, res) => {
                 path: 'authenticationId',
                 select: 'phoneNo -_id'
             })
+            .sort({createdAt : -1})
         return res.status(200).json({
             message: 'List of Bookings You have Posted',
             data: bookings
