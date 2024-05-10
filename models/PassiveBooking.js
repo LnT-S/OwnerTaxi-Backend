@@ -113,8 +113,18 @@ const passiveBookingSchema = new mongoose.Schema({
       },
     },
   },
+  distance:{
+    type : String
+  },
   budget: {
     type: Number,
+  },
+  bookingNo : {
+    type : Number
+  },
+  verifiedBy : {
+    type : String,
+    enum : ['Owner Taxi', 'Vendor']
   },
   bookingType: {
     type: String,
@@ -138,37 +148,17 @@ const passiveBookingSchema = new mongoose.Schema({
   extrasIncluded: {
     type: Boolean,
   },
-  package: {
-    costPerKm: {
-      type: Number,
+  IRPackage: {
+    extraDistance : {
+      type : String
     },
-    costPerHour: {
-      type: Number,
-    },
-    distance: {
-      type: Number,
-    },
-    hours: {
-      type: Number,
-    },
-    extra: {
-      costPerKm: {
-        type: Number,
-      },
-      costPerHour: {
-        type: Number,
-      },
-      distance: {
-        type: Number,
-      },
-      hours: {
-        type: Number,
-      },
-    },
+    extraTime : { 
+      type : String
+    }
   },
   status: {
     type: String,
-    enum: ['accepted', 'pending', 'closed','bidstarted','cancelled']
+    enum: ['accepted', 'pending','picked','closed','bidstarted','cancelled']
   },
   acceptor: {
     id: {

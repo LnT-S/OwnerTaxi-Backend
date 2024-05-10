@@ -6,6 +6,7 @@ import authentication from './authentication/index.js'
 import customer from './customer/index.js'
 import driver from './driver/index.js'
 import vendor from './vendor/index.js'
+import superadmin from './superAdmin/index.js'
 import { vehicleInfo } from '../controllers/GenericController.js'
 
 router.get('/',(req,res)=>{
@@ -18,6 +19,7 @@ router.use('/authentication' , authentication)
 router.use('/customer',passport.authenticate('jwt',{session : false}) , customer)
 router.use('/driver',passport.authenticate('jwt',{session : false}) , driver)
 router.use('/vendor',passport.authenticate('jwt',{session : false}) , vendor)
+router.use('/superadmin',passport.authenticate('jwt',{session : false}) , superadmin)
 
 //VEHICLE INFO
 router.get('/vehicle-info',vehicleInfo)

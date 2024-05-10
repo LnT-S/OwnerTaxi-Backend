@@ -1,9 +1,10 @@
+import { kMaxLength } from "buffer";
 import mongoose from "mongoose";
 import multer from 'multer'
 import path from 'path'
 const __dirname = path.resolve(path.dirname(''));
 const AVATAR_PATH = path.join('/uploads/images');
-const DOCUMENT_PATH = path.join('/ouploads/documents')
+const DOCUMENT_PATH = path.join('/uploads/documents')
 
 const authenticationSchema = new mongoose.Schema(
   {
@@ -12,15 +13,16 @@ const authenticationSchema = new mongoose.Schema(
     },
     phoneNo: {
       type: Number,
-      required : true,
+      required: true,
       unique: true,
+      maxLength: 9999999999
     },
     otp: {
       type: String,
     },
     type: {
       type: String,
-      enum: ["vendor", "driver", "superAdmin", "customer"],
+      enum: ["vendor", "driver", "superadmin", "customer"],
     },
     avatar: {
       type: String,
@@ -32,13 +34,7 @@ const authenticationSchema = new mongoose.Schema(
       type: String,
     },
     rating: {
-      type: Number,
-      validate: {
-        validator: function (value) {
-          return value <= 5 && value >= 0;
-        },
-      },
-      message: "Rating Must be between 0 and 5",
+      type: Number
     },
     shouldHaveVehicle: {
       type: Boolean,
@@ -55,27 +51,56 @@ const authenticationSchema = new mongoose.Schema(
         capacity: {
           type: Number,
         },
-        no: {
-          type: String,
+        pending: {
+          type: Number
         },
-        info: {
-          document: {
-            image: {
-              type: String,
-            },
-            name: {
+        vehicleNo: {
+          type: String
+        },
+        document: [
+          {
+            documentFor: {
               type: String,
             },
             documentNo: {
               type: String,
             },
-          },
-        },
+            image: {
+              type: String,
+            },
+            documentName: {
+              type: String
+            },
+            status: {
+              type: String,
+              enum: ['Missing', 'Uploaded', 'Accept', 'Reject']
+            }
+          }
+        ]
       },
+    ],
+    userDocument: [
+      {
+        documentName: {
+          type: String
+        },
+        documentNo: {
+          type: String,
+          unique: true,
+          sparse: true
+        },
+        image: {
+          type: String,
+        },
+        status: {
+          type: String,
+          enum: ['Missing', 'Uploaded', 'Accept', 'Reject']
+        }
+      }
     ],
     verification: {
       type: Boolean,
-      default : false
+      default: false
     },
   },
   {
@@ -86,27 +111,27 @@ const authenticationSchema = new mongoose.Schema(
 try {
   let imageStorage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, AVATAR_PATH))
+      cb(null, path.join(__dirname, AVATAR_PATH))
     },
     filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now();
-        cb(null, file.fieldname + '-' + uniqueSuffix)
+      const uniqueSuffix = Date.now();
+      cb(null, file.fieldname + '-' + uniqueSuffix)
     }
   })
   let documentStorage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, DOCUMENT_PATH))
+      cb(null, path.join(__dirname, DOCUMENT_PATH))
     },
     filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now();
-        cb(null, file.fieldname + '-' + uniqueSuffix)
+      const uniqueSuffix = Date.now();
+      cb(null, file.fieldname + '-' + uniqueSuffix)
     }
   })
   authenticationSchema.statics.uploadImage = multer({ storage: imageStorage }).single('avatar');
-  authenticationSchema.statics.uploadDocument = multer({ storage: imageStorage }).array('documents');
+  authenticationSchema.statics.uploadDocument = multer({ storage: documentStorage }).single('document');
   authenticationSchema.statics.avatarPath = AVATAR_PATH;
   authenticationSchema.statics.documentPath = DOCUMENT_PATH;
-  
+
 } catch (error) {
   console.log("ERROR IN MULTER CONFIGURATION ", error)
 }

@@ -11,23 +11,20 @@ const activeBookingSchema = new mongoose.Schema({
     },
     driverResponse : [
         {
+            bookingPostedBy : {
+                type: String
+            },
             driverPhone : {
-                type : Number
+                type : String
             },
             driverId : {
-                type : Number
+                type : String
             },
             budget : {
                 type : Number
             },
             rating : {
                 type : Number,
-                validator : {
-                    validate : function(value){
-                        return value >=0 && value <=5
-                    },
-                    message : 'Rating should greater than zero and less than 5 inclusively'
-                }
             }
         }
     ]
