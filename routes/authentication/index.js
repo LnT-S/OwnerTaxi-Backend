@@ -6,6 +6,6 @@ import { deleteAccount, deleteAccountLink, getOtp , verifyOtp } from '../../cont
 router.post('/get-otp',getOtp)
 router.post('/verify-otp',verifyOtp)
 router.get('/delete-account',passport.authenticate('jwt',{session : false}),deleteAccount)
-router.get('/request-to-delete/:phoneNo',deleteAccountLink)
+router.get('/request-to-delete',deleteAccountLink)
 
 export default router
