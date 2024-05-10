@@ -10,6 +10,7 @@ import jwt from "jsonwebtoken";
 import Requirement from "../models/Requirement.js";
 import mongoose from "mongoose";
 import dotenv from 'dotenv'
+dotenv.config()
 
 export const getOtp = async function (req, res) {
     console.log('API :  /authentication/get-otp', req.body)
@@ -89,25 +90,23 @@ export const getOtp = async function (req, res) {
                 otp: OTP
             })
         }
+        const response = await axios.get(URL);
+        console.log('RESPONSE IS ', response.data)
+        if (response.status === 200) {
+            return res.status(200).json({
+                message: 'OTP sent successfully'
+            })
+        } else {
+            console.log("AXIOS CALL ERROR", response?.error)
+            return res.status(400).json({
+                message: 'SMS SERVER DOWN !! TRY AFTER SOME TIME'
+            })
+        }
 
-        //     const response = await axios.get(URL);
-        //     console.log('RESPONSE IS ', response.data)
-        //     if (response.status === 200) {
-        //         return res.status(200).json({
-        //             message: 'OTP sent successfully'
-        //         })
-        //     }else{
-        //         throw Error("AXIOS CALL ERROR",response?.error)
-        //     }
-
-        return res.status(200).json({
-            message: 'OTP sent successfully'
-        })
     } catch (error) {
         console.error(error);
-        res.status(500).json({message : 'Internal Server Error'});
+        res.status(500).json({ message: 'Internal Server Error' });
     }
-
 }
 export const verifyOtp = async (req, res) => {
     console.log('/create-session', req.body)

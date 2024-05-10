@@ -3,7 +3,6 @@ import PassiveBooking from '../models/PassiveBooking.js';
 import Authentication from '../models/Authentication.js';
 import Requirement from '../models/Requirement.js';
 
-
 import path from 'path'
 import * as fs from 'fs'
 import { log } from 'console';
