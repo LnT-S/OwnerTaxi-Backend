@@ -90,18 +90,21 @@ export const getOtp = async function (req, res) {
                 otp: OTP
             })
         }
-        const response = await axios.get(URL);
-        console.log('RESPONSE IS ', response.data)
-        if (response.status === 200) {
-            return res.status(200).json({
-                message: 'OTP sent successfully'
-            })
-        } else {
-            console.log("AXIOS CALL ERROR", response?.error)
-            return res.status(400).json({
-                message: 'SMS SERVER DOWN !! TRY AFTER SOME TIME'
-            })
-        }
+        // const response = await axios.get(URL);
+        // console.log('RESPONSE IS ', response.data)
+        // if (response.status === 200) {
+        //     return res.status(200).json({
+        //         message: 'OTP sent successfully'
+        //     })
+        // } else {
+        //     console.log("AXIOS CALL ERROR", response?.error)
+        //     return res.status(400).json({
+        //         message: 'SMS SERVER DOWN !! TRY AFTER SOME TIME'
+        //     })
+        // }
+        return res.status(200).json({
+            message: 'OTP sent successfully'
+        })
 
     } catch (error) {
         console.error(error);
@@ -158,18 +161,18 @@ export const deleteAccountLink = async (req, res) => {
     console.log('/authentication/request-to-delete/:phoneNo');
     try {
         console.log(("QUERY", req.query));
-        let {phoneNo} = req.query
-        let user = await Authentication.findOne({phoneNo})
-        console.log("USER ",user);
-        if(!user || user===undefined){
+        let { phoneNo } = req.query
+        let user = await Authentication.findOne({ phoneNo })
+        console.log("USER ", user);
+        if (!user || user === undefined) {
             return res.status(400).json({
-                message : 'User does not belong to Owner Taxi Family'
+                message: 'User does not belong to Owner Taxi Family'
             })
-        }else{
+        } else {
             user.requestToDelete = true
             await user.save()
             return res.status(200).json({
-                message : 'Your Request has been accepted. Your account will deleted within 7 days in case of no activity. Make Sure You donot login to your account'
+                message: 'Your Request has been accepted. Your account will deleted within 7 days in case of no activity. Make Sure You donot login to your account'
             })
         }
     } catch (error) {

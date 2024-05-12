@@ -146,7 +146,19 @@ const passiveBookingSchema = new mongoose.Schema({
     },
   },
   extrasIncluded: {
-    type: Boolean,
+    tollExtra:{
+      type : "String",
+      enum : ['included','extra','amount']
+    },
+    tollExtraAmount :{
+      type : String
+    },
+    extraKm : {
+      type : String
+    },
+    costPerKm:{
+      type :String
+    }
   },
   IRPackage: {
     extraDistance : {

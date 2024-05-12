@@ -16,7 +16,7 @@ export const getProfileInfo = async (req, res) => {
     })
 }
 export const booking = async (req, res) => {
-    console.log('API : /driver/booking \n', req.user, '\n', req.body)
+    console.log('API : /driver/booking \n', '\n', req.body)
     try {
         let previousBooking = await PassiveBooking.find({ id: req.user._id })
         console.log('>>', previousBooking)
@@ -304,8 +304,8 @@ export const acceptIntercityBooking = async (req, res) => {
                     driverId: acceptorId,
                     budget: booking.budget,
                     rating: acceptor.rating,
-                    name : acceptor.name,
-                    image : acceptor.avatar
+                    name: acceptor.name,
+                    image: acceptor.avatar
                 }
             }
         }, {
@@ -398,7 +398,7 @@ export const getBookingsDriverHasAccepted = async (req, res) => {
                 path: 'authenticationId',
                 select: 'phoneNo -_id'
             })
-            .sort({createdAt : -1})
+            .sort({ createdAt: -1 })
         console.log('Bookings ', result);
         return res.status(200).json({
             message: 'List of Bookings You have Accepted',
@@ -422,7 +422,7 @@ export const getBookingsDriverHasPosted = async (req, res) => {
                 path: 'authenticationId',
                 select: 'phoneNo -_id'
             })
-            .sort({createdAt : -1})
+            .sort({ createdAt: -1 })
         return res.status(200).json({
             message: 'List of Bookings You have Posted',
             data: bookings
@@ -595,7 +595,7 @@ export const getHistory = async (req, res) => {
                     {
                         $and: [
                             { id: userId },
-                            {status : {$in : ['accepted','closed']}}
+                            { status: { $in: ['closed'] } }
                         ]
                     }
                 ]
@@ -604,6 +604,7 @@ export const getHistory = async (req, res) => {
                 path: 'id',
                 select: 'phoneNo -_id'
             })
+            .sort({createdAt : -1})
         console.log('History ', result);
         return res.status(200).json({
             message: 'Your accepted booking history',
@@ -615,4 +616,43 @@ export const getHistory = async (req, res) => {
             message: 'Internal Server Error'
         })
     }
+}
+export const closeBooking = async (req, res) => {
+    console.log("API : /driver/close-booking");
+    try {
+        const { bookingId, rating } = req.body
+        const userId = req.user._id
+        let result = await PassiveBooking.find({
+            $and: [
+                { id: userId },
+                { status: { $in: ['closed'] } }
+            ]
+        })
+        let booking = await PassiveBooking.findById(bookingId)
+        let userToRate = await Authentication.findById(booking.id)
+        if (result.length === 0) {
+            userToRate.rating = rating
+        } else {
+            userToRate.rating = (rating + userToRate.rating * result.length) / result.length
+        }
+        await userToRate.save()
+        booking.status = 'closed'
+        await booking.save()
+        await ActiveBooking.findOneAndUpdate({
+            passiveBookingId: bookingId
+        }, {
+            driverResponse: []
+        }, { new: true })
+        return res.status(200).json({
+            message: 'Thnaks for your feedback !! Booking Closed Now'
+        })
+    } catch (error) {
+        console.log("ERROR CLOSING BOOKING ", error);
+        return res.status(500).json({
+            message: "Internal Server Error"
+        })
+    }
+
+
+
 }

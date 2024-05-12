@@ -1,5 +1,5 @@
 import express from 'express'
-import { acceptIntercityBooking, addVehicle, assignBooking, booking, checkWhetherAcceptedTheBooking, deleteBooking, getBookingsDriverHasAccepted, getBookingsDriverHasPosted, getDocumentInfo, getHistory, getIntercityBookingFromPostVendor, getLocalBooking, getProfileInfo, isDocumentVerified, unAssignBooking, unacceptTheBooking, uploadDocument } from '../../controllers/DriverController.js'
+import { acceptIntercityBooking, addVehicle, assignBooking, booking, checkWhetherAcceptedTheBooking, closeBooking, deleteBooking, getBookingsDriverHasAccepted, getBookingsDriverHasPosted, getDocumentInfo, getHistory, getIntercityBookingFromPostVendor, getLocalBooking, getProfileInfo, isDocumentVerified, unAssignBooking, unacceptTheBooking, uploadDocument } from '../../controllers/DriverController.js'
 const router = express.Router()
 
 router.get('/get-profile-info',getProfileInfo)
@@ -19,5 +19,6 @@ router.post('/assign-intercity-booking',assignBooking)
 router.post('/un-assign-intercity-booking',unAssignBooking)
 router.post('/delete-booking',deleteBooking)
 router.get('/get-history',getHistory)
+router.post('/close-booking',closeBooking)
 
 export default router
