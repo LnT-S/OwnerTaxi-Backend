@@ -6,6 +6,7 @@ import Requirement from '../models/Requirement.js';
 import path from 'path'
 import * as fs from 'fs'
 import { log } from 'console';
+import Wallet from '../models/Wallet.js';
 const __dirname = path.resolve(path.dirname(''));
 
 export const getProfileInfo = async (req, res) => {
@@ -62,14 +63,19 @@ export const getLocalBooking = async (req, res) => {
 export const getIntercityBookingFromPostVendor = async (req, res) => {
     console.log("API : /driver/get-intercity-bookings-post-vendor", req.user);
     try {
-        let bookings = await PassiveBooking.find({
+        let pbookings = await PassiveBooking.find({
             $or: [{ initiator: "driver" }, { initiator: "vendor" }],
             $or: [{ bookingType: "intercity" }, { bookingType: "rental" }],
-            $or: [{ status: 'pending' }, { status: "accepted" }, { status: "bidstarted" }]
+            $or: [{ status: 'pending' }, { status: 'bidstarted' }]
+        }).sort({ createdAt: -1 })
+        let abookings = await PassiveBooking.find({
+            $or: [{ initiator: "driver" }, { initiator: "vendor" }],
+            $or: [{ bookingType: "intercity" }, { bookingType: "rental" }],
+            status: "accepted"
         }).sort({ createdAt: -1 })
         return res.status(200).json({
             message: 'INTERCITY BOOOKING FROM VENDOR',
-            data: bookings
+            data: [...pbookings, ...abookings]
         })
     } catch (error) {
         console.log("ERROR IN POST VENDOR INTERCITY DATA FETCH ", error);
@@ -423,9 +429,12 @@ export const getBookingsDriverHasPosted = async (req, res) => {
                 select: 'phoneNo -_id'
             })
             .sort({ createdAt: -1 })
+        
+        let sorted = bookings.filter(el=>(el.passiveBookingId.status==="pending" || el.passiveBookingId.status==="bidstarted"))
+        console.log("SORTED ",sorted.length);
         return res.status(200).json({
             message: 'List of Bookings You have Posted',
-            data: bookings
+            data: sorted
         })
     } catch (error) {
         console.log('ERROR GETTING MY BOOKINGS ', error);
@@ -604,7 +613,7 @@ export const getHistory = async (req, res) => {
                 path: 'id',
                 select: 'phoneNo -_id'
             })
-            .sort({createdAt : -1})
+            .sort({ createdAt: -1 })
         console.log('History ', result);
         return res.status(200).json({
             message: 'Your accepted booking history',
@@ -655,4 +664,54 @@ export const closeBooking = async (req, res) => {
 
 
 
+}
+export const uprollTransaction = async (req, res) => {
+    console.log("API : /driver/uproll-transaction")
+    try {
+        Wallet.uploadSs(req, res, async function (err) {
+            if (err) {
+                console.log("MULTER ERROR ", err);
+                return res.status(400).json({
+                    message: 'INTERNAL SERVER ERROR'
+                })
+            }
+            const { amount } = req.body
+            console.log("FILES \n", req.file,amount);
+            let wallet = await Wallet.findOne({id : req.user._id})
+            if(!wallet){
+                wallet = await Wallet.create({id : req.user._id})
+            }
+            wallet.transactionList.push({
+                date : new Date().getTime(),
+                amount,
+                ss : path.join(Wallet.ssPath, req?.file?.filename),
+                status : "uprolled"
+
+            })
+            await wallet.save()
+            return res.status(200).json({
+                message : 'Transaction Uprolled Successfully !! It will be verified within 24 hours'
+            })
+        })
+    } catch (error) {
+        console.log("ERROR UPROLLING TRANSACTION ",error);
+        return res.status(500).json({
+            message : "Internal Server Error"
+        })
+    }
+}
+export const getTransactionInfo = async (req,res)=>{
+    console.log("API : /driver/get-transaction-info");
+    try {
+        let wallet = await Wallet.findOne({id : req.user._id});
+        return res.status(200).json({
+            message : "Transation Info for" + req.user.phoneNo,
+            data : wallet
+        })
+    } catch (error) {
+        console.log("ERRROR IN TRANSACTION LIST ",error);
+        return res.status(500).json({
+            message : "Internal Server Error"
+        })
+    }
 }

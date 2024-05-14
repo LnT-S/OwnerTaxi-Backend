@@ -90,21 +90,21 @@ export const getOtp = async function (req, res) {
                 otp: OTP
             })
         }
-        const response = await axios.get(URL);
-        console.log('RESPONSE IS ', response.data)
-        if (response.status === 200) {
-            return res.status(200).json({
-                message: 'OTP sent successfully'
-            })
-        } else {
-            console.log("AXIOS CALL ERROR", response?.error)
-            return res.status(400).json({
-                message: 'SMS SERVER DOWN !! TRY AFTER SOME TIME'
-            })
-        }
-        // return res.status(200).json({
-        //     message: 'OTP sent successfully'
-        // })
+        // const response = await axios.get(URL);
+        // console.log('RESPONSE IS ', response.data)
+        // if (response.status === 200) {
+        //     return res.status(200).json({
+        //         message: 'OTP sent successfully'
+        //     })
+        // } else {
+        //     console.log("AXIOS CALL ERROR", response?.error)
+        //     return res.status(400).json({
+        //         message: 'SMS SERVER DOWN !! TRY AFTER SOME TIME'
+        //     })
+        // }
+        return res.status(200).json({
+            message: 'OTP sent successfully'
+        })
 
     } catch (error) {
         console.error(error);

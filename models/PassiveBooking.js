@@ -113,18 +113,18 @@ const passiveBookingSchema = new mongoose.Schema({
       },
     },
   },
-  distance:{
-    type : String
+  distance: {
+    type: String
   },
   budget: {
     type: Number,
   },
-  bookingNo : {
-    type : Number
+  bookingNo: {
+    type: Number
   },
-  verifiedBy : {
-    type : String,
-    enum : ['Owner Taxi', 'Vendor']
+  verifiedBy: {
+    type: String,
+    enum: ['Owner Taxi', 'Vendor']
   },
   bookingType: {
     type: String,
@@ -146,31 +146,48 @@ const passiveBookingSchema = new mongoose.Schema({
     },
   },
   extrasIncluded: {
-    tollExtra:{
-      type : "String",
-      enum : ['included','extra','amount']
+    tollExtra: {
+      type: "String",
+      enum: ['included', 'extra', 'amount']
     },
-    tollExtraAmount :{
-      type : String
+    tollExtraAmount: {
+      type: String
     },
-    extraKm : {
-      type : String
+    borderExtra: {
+      type: "String",
+      enum: ['included', 'extra', 'amount']
     },
-    costPerKm:{
-      type :String
+    borderExtraAmount: {
+      type: String
+    },
+    parkingExtra: {
+      type: "String",
+      enum: ['included', 'extra', 'amount']
+    },
+    parkingExtraAmount: {
+      type: String
+    },
+    extraKm: {
+      type: String
+    },
+    extraHours: {
+      type: String
+    },
+    driverDA :{
+      type: String
     }
   },
   IRPackage: {
-    extraDistance : {
-      type : String
+    extraDistance: {
+      type: String
     },
-    extraTime : { 
-      type : String
+    extraTime: {
+      type: String
     }
   },
   status: {
     type: String,
-    enum: ['accepted', 'pending','picked','closed','bidstarted','cancelled']
+    enum: ['accepted', 'pending', 'picked', 'closed', 'bidstarted', 'cancelled']
   },
   acceptor: {
     id: {

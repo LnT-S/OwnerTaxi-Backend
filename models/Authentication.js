@@ -62,8 +62,10 @@ const authenticationSchema = new mongoose.Schema(
             documentFor: {
               type: String,
             },
-            status: {
+            documentNo: {
               type: String,
+              unique: true,
+              sparse: true
             },
             image: {
               type: String,
