@@ -67,15 +67,16 @@ export const getIntercityBookingFromPostVendor = async (req, res) => {
             $or: [{ initiator: "driver" }, { initiator: "vendor" }],
             $or: [{ bookingType: "intercity" }, { bookingType: "rental" }],
             $or: [{ status: 'pending' }, { status: 'bidstarted' }]
-        }).sort({ createdAt: -1 })
+        }).populate("id","verifiedBy").sort({ createdAt: -1 })
+        console.log('**',pbookings)
         let abookings = await PassiveBooking.find({
             $or: [{ initiator: "driver" }, { initiator: "vendor" }],
             $or: [{ bookingType: "intercity" }, { bookingType: "rental" }],
             status: "accepted"
-        }).sort({ createdAt: -1 })
+        }).populate("id","verifiedBy").sort({ createdAt: -1 })
         return res.status(200).json({
             message: 'INTERCITY BOOOKING FROM VENDOR',
-            data: [...pbookings, ...abookings]
+            data: [...pbookings, ...abookings,]
         })
     } catch (error) {
         console.log("ERROR IN POST VENDOR INTERCITY DATA FETCH ", error);

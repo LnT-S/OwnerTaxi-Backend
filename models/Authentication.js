@@ -73,6 +73,9 @@ const authenticationSchema = new mongoose.Schema(
             documentName: {
               type: String
             },
+            comment : {
+              type : String
+            },
             status: {
               type: String,
               enum: ['Missing', 'Uploaded', 'Accept', 'Reject']
@@ -94,6 +97,9 @@ const authenticationSchema = new mongoose.Schema(
         image: {
           type: String,
         },
+        comment : {
+          type : String
+        },
         status: {
           type: String,
           enum: ['Missing', 'Uploaded', 'Accept', 'Reject']
@@ -107,6 +113,11 @@ const authenticationSchema = new mongoose.Schema(
     requestToDelete : {
       type : Boolean,
       default : false
+    },
+    verifiedBy : {
+      type : String,
+      enum : ["Owner Taxi","Vendor",""],
+      default : ""
     }
   },
   {
