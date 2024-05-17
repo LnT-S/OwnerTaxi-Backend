@@ -64,8 +64,6 @@ const authenticationSchema = new mongoose.Schema(
             },
             documentNo: {
               type: String,
-              unique: true,
-              sparse: true
             },
             image: {
               type: String,
@@ -91,8 +89,6 @@ const authenticationSchema = new mongoose.Schema(
         },
         documentNo: {
           type: String,
-          unique: true,
-          sparse: true
         },
         image: {
           type: String,
