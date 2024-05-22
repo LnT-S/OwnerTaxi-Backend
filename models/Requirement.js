@@ -13,6 +13,10 @@ const requirementSchema = new mongoose.Schema({
             },
             documentName : {
                 type : String,
+            },
+            required  : {
+                type : Boolean,
+                default : false
             }
         }
     ]

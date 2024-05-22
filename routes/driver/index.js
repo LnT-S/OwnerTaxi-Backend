@@ -1,5 +1,5 @@
 import express from 'express'
-import { acceptIntercityBooking, addVehicle, assignBooking, booking, checkWhetherAcceptedTheBooking, closeBooking, deleteBooking, getBookingsDriverHasAccepted, getBookingsDriverHasPosted, getDocumentInfo, getHistory, getIntercityBookingFromPostVendor, getLocalBooking, getProfileInfo, getTransactionInfo, isDocumentVerified, unAssignBooking, unacceptTheBooking, uploadDocument, uprollTransaction } from '../../controllers/DriverController.js'
+import { acceptIntercityBooking, addVehicle, assignBooking, booking, checkWhetherAcceptedTheBooking, closeBooking, deleteBooking, getBookingsDriverHasAccepted, getBookingsDriverHasPosted, getDocumentInfo, getHistory, getIntercityBookingFromPostVendor, getLocalBooking, getProfileInfo, getTransactionInfo, isDocumentVerified, payToSuperAdmin, unAssignBooking, unacceptTheBooking, uploadDocument, uprollTransaction } from '../../controllers/DriverController.js'
 const router = express.Router()
 
 router.get('/get-profile-info',getProfileInfo)
@@ -22,5 +22,6 @@ router.get('/get-history',getHistory)
 router.post('/close-booking',closeBooking)
 router.post('/uproll-transaction',uprollTransaction)
 router.get('/get-transaction-info',getTransactionInfo)
+router.post('/pay',payToSuperAdmin)
 
 export default router

@@ -52,7 +52,8 @@ export const getOtp = async function (req, res) {
                                 $map: {
                                     input: "$vehicleDocuments",
                                     as: "obj",
-                                    in: { documentFor: "$$obj.documentFor", documentName: "$$obj.documentName" } // Exclude _id field
+                                    in: { documentFor: "$$obj.documentFor", documentName: "$$obj.documentName",
+                                    required : "$$obj.required" } // Exclude _id field
                                 }
                             }
                         }
@@ -90,21 +91,21 @@ export const getOtp = async function (req, res) {
                 otp: OTP
             })
         }
-        const response = await axios.get(URL);
-        console.log('RESPONSE IS ', response.data)
-        if (response.status === 200) {
-            return res.status(200).json({
-                message: 'OTP sent successfully'
-            })
-        } else {
-            console.log("AXIOS CALL ERROR", response?.error)
-            return res.status(400).json({
-                message: 'SMS SERVER DOWN !! TRY AFTER SOME TIME'
-            })
-        }
-        // return res.status(200).json({
-        //     message: 'OTP sent successfully'
-        // })
+        // const response = await axios.get(URL);
+        // console.log('RESPONSE IS ', response.data)
+        // if (response.status === 200) {
+        //     return res.status(200).json({
+        //         message: 'OTP sent successfully'
+        //     })
+        // } else {
+        //     console.log("AXIOS CALL ERROR", response?.error)
+        //     return res.status(400).json({
+        //         message: 'SMS SERVER DOWN !! TRY AFTER SOME TIME'
+        //     })
+        // }
+        return res.status(200).json({
+            message: 'OTP sent successfully'
+        })
 
     } catch (error) {
         console.error(error);
@@ -136,6 +137,52 @@ export const verifyOtp = async (req, res) => {
             message: 'OTP DOES NOT MATCH!! DO NOT ENTER MANUALLY',
             token: null
         })
+    }
+}
+export const updateSubscription = async (req, res) => {
+    console.log("API : /authentication/update-subscription");
+    try {
+        const { sId } = req.body
+        if (!sId) {
+            res.status(400).json({ message: 'Subscription Id Required' });
+        }
+        const response = await axios.get(`https://onesignal.com/api/v1/players/${sId}?app_id=${process.env.ONESIGNAL_APP_ID}`, {
+            headers: {
+                'Authorization': `Basic ${process.env.ONESIGNAL_APP_KEY}`
+            }
+        });
+        console.log("RESPONSE OF SUBSCRIPTION ", response.data)
+        if (response.status !== 200) {
+            return res.status(400).json({
+                message: response.data
+            })
+        }
+        let user = await Authentication.findOne({ phoneNo: req.user.phoneNo })
+        // console.log("USER IS ",user);
+        if (!user) {
+            return res.status(400).json({ message: 'User Not Found' });
+        }
+        if (user.subscriptionId !== sId) {
+            user.subscriptionId = sId
+            await user.save()
+        }
+        return res.status(200).json({
+            message: "Subscribed To Notifications",
+            data: user.subscriptionId
+        })
+    } catch (error) {
+        // console.log("ERROR IN UPDATING SUBSCRIPTION ", error?.response?.status ,error.name, Object.keys(error));
+        if(error?.response?.status===400 && error?.name==="AxiosError"){
+            return res.status(error?.response?.status).json({
+                message : "Subscription Id Does Not Exist",
+                data : error?.response?.data
+            })
+        }
+        res.status(500).json({
+            message: 'Internal Server Error',
+            data : error
+        });
+
     }
 }
 export const deleteAccount = async (req, res) => {

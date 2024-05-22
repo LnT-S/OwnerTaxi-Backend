@@ -24,6 +24,7 @@ passport.use(new JWTStrategy(opts, async function (req, jwtPayload, done) {
         })
         .catch(err => {
             console.log('Error finding user through JWT._id', err);
+            return done(err,false)
         })
 }))
 

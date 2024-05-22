@@ -2,11 +2,13 @@ import ActiveBooking from '../models/ActiveBooking.js'
 import PassiveBooking from '../models/PassiveBooking.js';
 import Authentication from '../models/Authentication.js';
 import Requirement from '../models/Requirement.js';
-
+import dotenv from 'dotenv'
+dotenv.config()
 import path from 'path'
 import * as fs from 'fs'
 import { log } from 'console';
 import Wallet from '../models/Wallet.js';
+import { sendNotification } from '../services/notification.js';
 const __dirname = path.resolve(path.dirname(''));
 
 export const getProfileInfo = async (req, res) => {
@@ -30,6 +32,28 @@ export const booking = async (req, res) => {
         let bookingNo = previousBooking.length + 1
         let psvBooking = await PassiveBooking.create({ id: req.user._id, ...req.body, status: "pending", bookingNo })
         await ActiveBooking.create({ authenticationId: req.user._id, passiveBookingId: psvBooking._id })
+        let notiUser = await Authentication.aggregate([
+            {
+                $match: {
+                    type: "driver"
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    sId: {
+                        $push: "$subscriptionId"
+                    }
+                }
+            }
+        ])
+        const title = "New Booking Posted";
+        const description = `Pick Up location is ${req.body?.pickUp?.description} and Drop location is ${req.body?.drop?.description} . Grab the booking now !`
+        const chunkSize = 1500;
+        for (let i = 0; i < notiUser[0]?.sId?.length; i += chunkSize) {
+            const chunk = notiUser[0]?.sId?.slice(i, i + chunkSize);
+            await sendNotification(process.env.NEW_BOOKING_CHANNEL_ID, chunk, title, description)
+        }
         return res.status(200).json({
             message: 'Your booking has been confirmed !'
         })
@@ -67,13 +91,13 @@ export const getIntercityBookingFromPostVendor = async (req, res) => {
             $or: [{ initiator: "driver" }, { initiator: "vendor" }],
             $or: [{ bookingType: "intercity" }, { bookingType: "rental" }],
             $or: [{ status: 'pending' }, { status: 'bidstarted' }]
-        }).populate("id","verifiedBy").sort({ createdAt: -1 })
-        console.log('**',pbookings)
+        }).populate("id", "verifiedBy phoneNo").sort({ createdAt: -1 })
+        console.log('**', pbookings)
         let abookings = await PassiveBooking.find({
             $or: [{ initiator: "driver" }, { initiator: "vendor" }],
             $or: [{ bookingType: "intercity" }, { bookingType: "rental" }],
             status: "accepted"
-        }).populate("id","verifiedBy").sort({ createdAt: -1 })
+        }).populate("id", "verifiedBy phoneNo").sort({ createdAt: -1 })
         return res.status(200).json({
             message: 'INTERCITY BOOOKING FROM VENDOR',
             data: [...pbookings, ...abookings,]
@@ -137,7 +161,10 @@ export const addVehicle = async (req, res) => {
                             $map: {
                                 input: "$vehicleDocuments",
                                 as: "obj",
-                                in: { documentFor: "$$obj.documentFor", documentName: "$$obj.documentName" } // Exclude _id field
+                                in: {
+                                    documentFor: "$$obj.documentFor", documentName: "$$obj.documentName",
+                                    required: "$$obj.required"
+                                } // Exclude _id field
                             }
                         }
                     }
@@ -273,7 +300,7 @@ export const uploadDocument = async (req, res) => {
 
 }
 export const acceptIntercityBooking = async (req, res) => {
-    console.log("API : /driver/accept-intercity-booking", req.user);
+    console.log("API : /driver/accept-intercity-booking", req.body);
     const { bookingId } = req.body
     let acceptorId = req.user._id;
     try {
@@ -320,6 +347,8 @@ export const acceptIntercityBooking = async (req, res) => {
         })
             .then(async data => {
                 await booking.save()
+                console.log("BOOKING POSTED BY DETAILS", bookingPostUser);
+                sendNotification(process.env.ACCEPT_BOOKING_CHANNEL_ID, [bookingPostUser.subscriptionId], "Booking Accepted", "Your Booking has been accepted by some one ! Check it out")
                 return res.status(200).json({
                     message: 'Booking Has Been Accepted',
                     data: { phoneNo: bookingPostUser.phoneNo }
@@ -430,9 +459,9 @@ export const getBookingsDriverHasPosted = async (req, res) => {
                 select: 'phoneNo -_id'
             })
             .sort({ createdAt: -1 })
-        
-        let sorted = bookings.filter(el=>(el.passiveBookingId.status==="pending" || el.passiveBookingId.status==="bidstarted"))
-        console.log("SORTED ",sorted.length);
+
+        let sorted = bookings.filter(el => (el.passiveBookingId.status === "pending" || el.passiveBookingId.status === "bidstarted" || el.passiveBookingId.status === "accepted"))
+        console.log("SORTED ", sorted.length);
         return res.status(200).json({
             message: 'List of Bookings You have Posted',
             data: sorted
@@ -448,9 +477,9 @@ export const isDocumentVerified = async (req, res) => {
     console.log("API : /driver/is-document-verified");
     try {
         let user = await Authentication.findById(req.user._id)
-        const allUserAccepted = user.userDocument.every(doc => doc.status === "Accept");
+        const allUserAccepted = user.userDocument.every(doc => (!doc.required || doc.status === "Accept"));
         console.log("ALL USER ACCEPTED ", allUserAccepted);
-        const vehicle = user.vehicle.every(v => v.document.every(el => el.status === 'Accept') === true)
+        const vehicle = user.vehicle.every(v => v.document.every(el => (!el.required || el.status === 'Accept')) === true)
         console.log("VEHICLS ACCEPTED ", vehicle)
         if (vehicle) {
             if (allUserAccepted) {
@@ -631,19 +660,19 @@ export const closeBooking = async (req, res) => {
     console.log("API : /driver/close-booking");
     try {
         const { bookingId, rating } = req.body
+        console.log(bookingId, rating);
         const userId = req.user._id
-        let result = await PassiveBooking.find({
-            $and: [
-                { id: userId },
-                { status: { $in: ['closed'] } }
-            ]
-        })
         let booking = await PassiveBooking.findById(bookingId)
+        let result = await PassiveBooking.find({
+            id: booking.id,
+            status: 'closed'
+        })
         let userToRate = await Authentication.findById(booking.id)
         if (result.length === 0) {
             userToRate.rating = rating
         } else {
-            userToRate.rating = (rating + userToRate.rating * result.length) / result.length
+            console.log((rating + userToRate?.rating * result?.length) / result?.length);
+            userToRate.rating = (rating + userToRate?.rating * result.length) / result.length
         }
         await userToRate.save()
         booking.status = 'closed'
@@ -677,42 +706,59 @@ export const uprollTransaction = async (req, res) => {
                 })
             }
             const { amount } = req.body
-            console.log("FILES \n", req.file,amount);
-            let wallet = await Wallet.findOne({id : req.user._id})
-            if(!wallet){
-                wallet = await Wallet.create({id : req.user._id})
+            console.log("FILES \n", req.file, amount);
+            let wallet = await Wallet.findOne({ id: req.user._id })
+            if (!wallet) {
+                wallet = await Wallet.create({ id: req.user._id })
             }
             wallet.transactionList.push({
-                date : new Date().getTime(),
+                date: new Date().getTime(),
                 amount,
-                ss : path.join(Wallet.ssPath, req?.file?.filename),
-                status : "uprolled"
+                ss: path.join(Wallet.ssPath, req?.file?.filename),
+                status: "uprolled"
 
             })
             await wallet.save()
             return res.status(200).json({
-                message : 'Transaction Uprolled Successfully !! It will be verified within 24 hours'
+                message: 'Transaction Uprolled Successfully !! It will be verified within 24 hours'
             })
         })
     } catch (error) {
-        console.log("ERROR UPROLLING TRANSACTION ",error);
+        console.log("ERROR UPROLLING TRANSACTION ", error);
         return res.status(500).json({
-            message : "Internal Server Error"
+            message: "Internal Server Error"
         })
     }
 }
-export const getTransactionInfo = async (req,res)=>{
+export const getTransactionInfo = async (req, res) => {
     console.log("API : /driver/get-transaction-info");
     try {
-        let wallet = await Wallet.findOne({id : req.user._id});
+        let wallet = await Wallet.findOne({ id: req.user._id });
         return res.status(200).json({
-            message : "Transation Info for" + req.user.phoneNo,
-            data : wallet
+            message: "Transation Info for" + req.user.phoneNo,
+            data: wallet
         })
     } catch (error) {
-        console.log("ERRROR IN TRANSACTION LIST ",error);
+        console.log("ERRROR IN TRANSACTION LIST ", error);
         return res.status(500).json({
-            message : "Internal Server Error"
+            message: "Internal Server Error"
         })
+    }
+}
+export const payToSuperAdmin = async (req, res) => {
+    console.log("API /driver/pay")
+    try {
+        const { amount } = req.body
+        let wallet = await Wallet.findOne({ id: req.user._id });
+        if (amount > wallet.balance) {
+            return res.status(400).json({
+                message: "Insufficient Amount"
+            })
+        } else {
+            wallet.balance = wallet.balance - parseInt(amount)
+            wallet.save()
+        }
+    } catch (error) {
+
     }
 }

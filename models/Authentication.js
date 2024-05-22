@@ -1,6 +1,7 @@
 import { kMaxLength } from "buffer";
 import mongoose from "mongoose";
 import multer from 'multer'
+import { type } from "os";
 import path from 'path'
 const __dirname = path.resolve(path.dirname(''));
 const AVATAR_PATH = path.join('/uploads/images');
@@ -16,6 +17,12 @@ const authenticationSchema = new mongoose.Schema(
       required: true,
       unique: true,
       maxLength: 9999999999
+    },
+    currentState : {
+      type : 'String'
+    },
+    subscriptionId : {
+      type : String
     },
     otp: {
       type: String,
@@ -40,6 +47,9 @@ const authenticationSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    expiryDateForDocuments : {
+      type : String
+    },
     vehicle: [
       {
         type: {
@@ -59,6 +69,10 @@ const authenticationSchema = new mongoose.Schema(
         },
         document: [
           {
+            required : {
+              type : Boolean,
+              default : false
+            },
             documentFor: {
               type: String,
             },
@@ -84,6 +98,10 @@ const authenticationSchema = new mongoose.Schema(
     ],
     userDocument: [
       {
+        required: {
+          type : Boolean,
+          default : false
+        },
         documentName: {
           type: String
         },
