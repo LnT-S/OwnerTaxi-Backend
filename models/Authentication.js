@@ -18,11 +18,11 @@ const authenticationSchema = new mongoose.Schema(
       unique: true,
       maxLength: 9999999999
     },
-    currentState : {
-      type : 'String'
+    currentState: {
+      type: 'String'
     },
-    subscriptionId : {
-      type : String
+    subscriptionId: {
+      type: String
     },
     otp: {
       type: String,
@@ -47,8 +47,8 @@ const authenticationSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    expiryDateForDocuments : {
-      type : String
+    expiryDateForDocuments: {
+      type: String
     },
     vehicle: [
       {
@@ -69,9 +69,13 @@ const authenticationSchema = new mongoose.Schema(
         },
         document: [
           {
-            required : {
-              type : Boolean,
-              default : false
+            required: {
+              type: Boolean,
+              default: false
+            },
+            autoGenerateNo: {
+              type: Boolean,
+              default: false
             },
             documentFor: {
               type: String,
@@ -85,8 +89,8 @@ const authenticationSchema = new mongoose.Schema(
             documentName: {
               type: String
             },
-            comment : {
-              type : String
+            comment: {
+              type: String
             },
             status: {
               type: String,
@@ -99,8 +103,12 @@ const authenticationSchema = new mongoose.Schema(
     userDocument: [
       {
         required: {
-          type : Boolean,
-          default : false
+          type: Boolean,
+          default: false
+        },
+        autoGenerateNo: {
+          type: Boolean,
+          default: false
         },
         documentName: {
           type: String
@@ -111,8 +119,8 @@ const authenticationSchema = new mongoose.Schema(
         image: {
           type: String,
         },
-        comment : {
-          type : String
+        comment: {
+          type: String
         },
         status: {
           type: String,
@@ -124,14 +132,14 @@ const authenticationSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
-    requestToDelete : {
-      type : Boolean,
-      default : false
+    requestToDelete: {
+      type: Boolean,
+      default: false
     },
-    verifiedBy : {
-      type : String,
-      enum : ["Owner Taxi","Vendor",""],
-      default : ""
+    verifiedBy: {
+      type: String,
+      enum: ["Owner Taxi", "Vendor", ""],
+      default: ""
     }
   },
   {

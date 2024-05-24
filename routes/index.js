@@ -45,7 +45,7 @@ router.post('/push-notification', async (req, res) => {
             headings : { en: "New Booking Posted" },
             contents: { en: "New Booking has been posted from Sitapur TO Jaipur" },
             isAndroid: true,
-            include_subscription_ids:notiUser[0].sId ,
+            include_subscription_ids:["93abfe4e-77ca-47e7-b4c6-4862a69cc67a"] ,
             // existing_android_channel_id : '6c3e7417-f4e9-4186-982f-b7edaa60e035',
             android_channel_id : '85f617fa-d257-47de-968e-4f032ea21579'
         };

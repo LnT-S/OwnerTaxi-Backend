@@ -53,7 +53,7 @@ export const getOtp = async function (req, res) {
                                     input: "$vehicleDocuments",
                                     as: "obj",
                                     in: { documentFor: "$$obj.documentFor", documentName: "$$obj.documentName",
-                                    required : "$$obj.required" } // Exclude _id field
+                                    required : "$$obj.required",autoGenerateNo :"$$obj.autoGenerateNo" } // Exclude _id field
                                 }
                             }
                         }
@@ -134,7 +134,7 @@ export const verifyOtp = async (req, res) => {
         user.verification = false;
         await user.save()
         return res.status(400).json({
-            message: 'OTP DOES NOT MATCH!! DO NOT ENTER MANUALLY',
+            message: 'OTP DOES NOT MATCH!!ENTER CORRECT OTP',
             token: null
         })
     }

@@ -163,7 +163,7 @@ export const addVehicle = async (req, res) => {
                                 as: "obj",
                                 in: {
                                     documentFor: "$$obj.documentFor", documentName: "$$obj.documentName",
-                                    required: "$$obj.required"
+                                    required: "$$obj.required",autoGenerateNo :"$$obj.autoGenerateNo"
                                 } // Exclude _id field
                             }
                         }
@@ -240,6 +240,24 @@ export const uploadDocument = async (req, res) => {
                 if (!document) {
                     throw new Error('Document not found');
                 }
+                console.log(documentNo, documentName);
+                let existingUser = await Authentication.aggregate([
+                    {
+                        $unwind: "$userDocument"
+                    },
+                    {
+                        $match: {
+                            "userDocument.documentName": documentName,
+                            "userDocument.documentNo": documentNo
+                        }
+                    }
+                ])
+                console.log("Existing Users", existingUser);
+                if(existingUser.length!==0){
+                    return res.status(400).json({
+                        message : "This document is already in use"
+                    })
+                }
                 document.image = path.join(Authentication.documentPath, req?.file?.filename)
                 document.documentNo = documentNo;
                 document.status = 'Uploaded';
@@ -272,6 +290,23 @@ export const uploadDocument = async (req, res) => {
                         console.log('Document not found');
                         return res.status(400).json({
                             message: "Document Missing"
+                        })
+                    }
+                    let existingUser = await Authentication.aggregate([
+                        {
+                            $unwind: "$userDocument"
+                        },
+                        {
+                            $match: {
+                                "userDocument.documentName": documentName,
+                                "userDocument.documentNo": documentNo
+                            }
+                        }
+                    ])
+                    console.log("Existing Users", existingUser);
+                    if(existingUser.length!==0){
+                        return res.status(400).json({
+                            message : "This document is already in use"
                         })
                     }
                     document.documentFor = documentFor;

@@ -5,23 +5,27 @@ const requirementSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Authentication",
     },
-    documentsList : [
+    documentsList: [
         {
-            documentFor : {
-                type : String,
-                enum : ['Driver','Vehicle']
+            documentFor: {
+                type: String,
+                enum: ['Driver', 'Vehicle']
             },
-            documentName : {
-                type : String,
+            documentName: {
+                type: String,
             },
-            required  : {
-                type : Boolean,
-                default : false
-            }
+            required: {
+                type: Boolean,
+                default: false
+            },
+            autoGenerateNo: {
+                type: Boolean,
+                default: false
+            },
         }
     ]
-},{
-    timestamps :true
+}, {
+    timestamps: true
 })
 
 const Requirement = mongoose.model('Requirement', requirementSchema)
