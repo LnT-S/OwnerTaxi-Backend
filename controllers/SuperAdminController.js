@@ -6,7 +6,7 @@ import Wallet from '../models/Wallet.js'
 
 export const addDocumentList = async (req, res) => {
     console.log("/add-document-to-list", req.user)
-    const { documentFor, documentName , required } = req.body
+    const { documentFor, documentName , required,autoGenerateNo } = req.body
     console.log(req.body)
 
     if (!documentFor && !documentName) {
@@ -30,7 +30,7 @@ export const addDocumentList = async (req, res) => {
         console.log("LIST ", list)
         if (list === null) {
             let obj = {
-                documentFor, documentName , required
+                documentFor, documentName , required, autoGenerateNo
             }
             let newList = await Requirement.findOneAndUpdate({ id: req.user._id }, {
                 $push: { documentsList: obj }
