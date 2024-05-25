@@ -294,15 +294,15 @@ export const uploadDocument = async (req, res) => {
                     }
                     let existingUser = await Authentication.aggregate([
                         {
-                            $unwind: "$userDocument"
+                          $unwind: "$vehicle"
                         },
                         {
-                            $match: {
-                                "userDocument.documentName": documentName,
-                                "userDocument.documentNo": documentNo
-                            }
+                          $match: {
+                            "vehicle.document.documentName" : documentName,
+                            "vehicle.document.documentNo" : documentNo
+                          }
                         }
-                    ])
+                      ])
                     console.log("Existing Users", existingUser);
                     if(existingUser.length!==0){
                         return res.status(400).json({
