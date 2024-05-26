@@ -25,7 +25,7 @@ const walletSchema = new mongoose.Schema({
             },
             status: {
                 type: String,
-                enum : ["uprolled","verifed","discarded"]
+                enum : ["uprolled","verifed","discarded","paid"]
             },
             ss: {
                 type: String,

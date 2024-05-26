@@ -1,42 +1,43 @@
 import mongoose from 'mongoose'
 
 const activeBookingSchema = new mongoose.Schema({
-    authenticationId : {
-        type : mongoose.Schema.Types.ObjectId,
-        ref : 'Authentication'
+    authenticationId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Authentication'
     },
-    passiveBookingId : {
-        type : mongoose.Schema.Types.ObjectId,
-        ref : 'PassiveBooking'
+    passiveBookingId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'PassiveBooking'
     },
-    driverResponse : [
+    driverResponse: [
         {
-            bookingPostedBy : {
+            bookingPostedBy: {
                 type: String
             },
-            driverPhone : {
-                type : String
+            driverPhone: {
+                type: String
             },
-            driverId : {
-                type : String
+            driverId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Authentication'
             },
-            budget : {
-                type : Number
+            budget: {
+                type: Number
             },
-            rating : {
-                type : Number,
+            rating: {
+                type: Number,
             },
-            name : {
-                type : String
+            name: {
+                type: String
             },
-            image : {
-                type : String
+            image: {
+                type: String
             }
         }
     ]
-},{
-    timestamps : true
+}, {
+    timestamps: true
 })
 
-const ActiveBooking = mongoose.model('ActiveBooking',activeBookingSchema)
+const ActiveBooking = mongoose.model('ActiveBooking', activeBookingSchema)
 export default ActiveBooking

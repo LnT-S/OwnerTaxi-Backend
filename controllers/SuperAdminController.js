@@ -185,7 +185,17 @@ export const setPaymentStatus = async (req, res) => {
         let wallet = await Wallet.findById(id)
         let transaction = wallet.transactionList.find(v => v.date === tId)
         if (transaction) {
-            if (status === "verifed") {
+            if (status === "verifed" ) {
+                if(transaction.status==="verifed"){
+                    return res.status(400).json({
+                        message : "Payment Already Verified"
+                    })
+                }
+                if(transaction.status==="paid"){
+                    return res.status(400).json({
+                        message : "This Transaction does not support any action"
+                    })
+                }
                 wallet.balance = wallet.balance + transaction.amount
                 transaction.status = "verifed";
                 await wallet.save()
@@ -194,7 +204,24 @@ export const setPaymentStatus = async (req, res) => {
                 })
             } else {
                 if (status === "discarded") {
-                    transaction.status = "discarded";
+                    if(transaction.status==="discarded"){
+                        return res.status(400).json({
+                            message : "Transaction already discarded"
+                        })
+                    }
+                    if(transaction.status==="paid"){
+                        return res.status(400).json({
+                            message : "This Transaction does not support any action"
+                        })
+                    }
+                    if(transaction.status==="uprolled"){
+                        transaction.status = "discarded";
+                        await wallet.save()
+                        return res.status(400).json({
+                            message : "This Transaction does not support any action"
+                        })
+                    }
+                    wallet.balance = wallet.balance - transaction.amount
                     await wallet.save()
                     return res.status(200).json({
                         message: "Status discarded successfully "

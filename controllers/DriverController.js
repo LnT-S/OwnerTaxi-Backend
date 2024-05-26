@@ -48,7 +48,7 @@ export const booking = async (req, res) => {
             }
         ])
         const title = "New Booking Posted";
-        const description = `Pick Up location is ${req.body?.pickUp?.description} and Drop location is ${req.body?.drop?.description} . Grab the booking now !`
+        const description = "Pick Up location is " + req.body?.pickUp?.description + " and Drop location is " + req.body?.drop?.description + ". Grab the booking now !"
         const chunkSize = 1500;
         for (let i = 0; i < notiUser[0]?.sId?.length; i += chunkSize) {
             const chunk = notiUser[0]?.sId?.slice(i, i + chunkSize);
@@ -163,7 +163,7 @@ export const addVehicle = async (req, res) => {
                                 as: "obj",
                                 in: {
                                     documentFor: "$$obj.documentFor", documentName: "$$obj.documentName",
-                                    required: "$$obj.required",autoGenerateNo :"$$obj.autoGenerateNo"
+                                    required: "$$obj.required", autoGenerateNo: "$$obj.autoGenerateNo"
                                 } // Exclude _id field
                             }
                         }
@@ -253,9 +253,9 @@ export const uploadDocument = async (req, res) => {
                     }
                 ])
                 console.log("Existing Users", existingUser);
-                if(existingUser.length!==0){
+                if (existingUser.length !== 0) {
                     return res.status(400).json({
-                        message : "This document is already in use"
+                        message: "This document is already in use"
                     })
                 }
                 document.image = path.join(Authentication.documentPath, req?.file?.filename)
@@ -294,19 +294,19 @@ export const uploadDocument = async (req, res) => {
                     }
                     let existingUser = await Authentication.aggregate([
                         {
-                          $unwind: "$vehicle"
+                            $unwind: "$vehicle"
                         },
                         {
-                          $match: {
-                            "vehicle.document.documentName" : documentName,
-                            "vehicle.document.documentNo" : documentNo
-                          }
+                            $match: {
+                                "vehicle.document.documentName": documentName,
+                                "vehicle.document.documentNo": documentNo
+                            }
                         }
-                      ])
+                    ])
                     console.log("Existing Users", existingUser);
-                    if(existingUser.length!==0){
+                    if (existingUser.length !== 0) {
                         return res.status(400).json({
-                            message : "This document is already in use"
+                            message: "This document is already in use"
                         })
                     }
                     document.documentFor = documentFor;
@@ -370,11 +370,12 @@ export const acceptIntercityBooking = async (req, res) => {
                 driverResponse: {
                     bookingPostedBy: bookingPostUser.type,
                     driverPhone: acceptor.phoneNo,
-                    driverId: acceptorId,
+                    driverId: acceptor._id,
                     budget: booking.budget,
                     rating: acceptor.rating,
                     name: acceptor.name,
-                    image: acceptor.avatar
+                    image: acceptor.avatar,
+                    verifiedBy : acceptor.verifiedBy
                 }
             }
         }, {
@@ -790,10 +791,47 @@ export const payToSuperAdmin = async (req, res) => {
                 message: "Insufficient Amount"
             })
         } else {
+            let obj = {
+                date : new Date().getTime(),
+                amount,
+                status  : "paid"
+            }
+            wallet.transactionList.push(obj)
             wallet.balance = wallet.balance - parseInt(amount)
-            wallet.save()
+            await wallet.save()
         }
+        return res.status(200).json({
+            message : "Transaction Completed",
+            data : wallet
+        })
     } catch (error) {
-
+        console.log("ERROR IN UPDATING WALLET");
+        return res.status(500).json({
+            message : "Internal Server Error"
+        })
+    }
+}
+export const deleteVehicle = async (req, res) => {
+    console.log("API /driver/delete-vehicle");
+    try {
+        const { vehicleNo } = req.body
+        console.log(vehicleNo);
+        let vehicle = await Authentication.findOneAndUpdate({
+            _id: req?.user?._id
+        }, {
+            $pull: { vehicle: { vehicleNo: vehicleNo } }
+        }, {
+            new: true
+        })
+        console.log(vehicle);
+        return res.status(200).json({
+            message: "Vehicle Deleted Successfully",
+            data : vehicle
+        })
+    } catch (error) {
+        console.log("ERROR IN DELETING VEHICLE");
+        return res.status(500).json({
+            message: "INTERNAL SERVER ERROR"
+        })
     }
 }
