@@ -111,7 +111,7 @@ export const getIntercityBookingFromPostVendor = async (req, res) => {
 }
 export const addVehicle = async (req, res) => {
     console.log("/add-vehicle", req.user)
-    const { type, subType, capacity, vehicleNo } = req.body
+    const { type, subType, capacity, vehicleNo, locality } = req.body
     try {
 
         if (!type && !subType && !capacity && !vehicleNo) {
@@ -133,7 +133,12 @@ export const addVehicle = async (req, res) => {
                 // Deconstruct the array field
                 { $unwind: "$documentsList" },
                 // Match documents where field1 is 'aman'
-                { $match: { "documentsList.documentFor": "Vehicle" } },
+                {
+                    $match: {
+                        "documentsList.documentFor": "Vehicle",
+                        "documentsList.locality": locality
+                    }
+                },
                 // Group by field1 and count occurrences
                 {
                     $group: {
@@ -146,7 +151,12 @@ export const addVehicle = async (req, res) => {
                 // Deconstruct the array field
                 { $unwind: "$documentsList" },
                 // Match documents where field1 is 'aman'
-                { $match: { "documentsList.documentFor": "Vehicle" } },
+                {
+                    $match: {
+                        "documentsList.documentFor": "Vehicle",
+                        "documentsList.locality": locality
+                    }
+                },
                 // Group by field1 and count occurrences
                 {
                     $group: {
@@ -181,7 +191,7 @@ export const addVehicle = async (req, res) => {
             console.log("REQUIRED FOUNND ", required, docs);
             let newVehicleInfo = await Authentication.findByIdAndUpdate(req.user._id, {
                 $push: {
-                    vehicle: { type, subType, capacity, vehicleNo, document: docs, pending: required[0]?.count }
+                    vehicle: { type,locality, subType, capacity, vehicleNo, document: docs, pending: required[0]?.count }
                 }
             }, { new: true })
             return res.status(200).json({
@@ -375,7 +385,7 @@ export const acceptIntercityBooking = async (req, res) => {
                     rating: acceptor.rating,
                     name: acceptor.name,
                     image: acceptor.avatar,
-                    verifiedBy : acceptor.verifiedBy
+                    verifiedBy: acceptor.verifiedBy
                 }
             }
         }, {
@@ -792,22 +802,22 @@ export const payToSuperAdmin = async (req, res) => {
             })
         } else {
             let obj = {
-                date : new Date().getTime(),
+                date: new Date().getTime(),
                 amount,
-                status  : "paid"
+                status: "paid"
             }
             wallet.transactionList.push(obj)
             wallet.balance = wallet.balance - parseInt(amount)
             await wallet.save()
         }
         return res.status(200).json({
-            message : "Transaction Completed",
-            data : wallet
+            message: "Transaction Completed",
+            data: wallet
         })
     } catch (error) {
         console.log("ERROR IN UPDATING WALLET");
         return res.status(500).json({
-            message : "Internal Server Error"
+            message: "Internal Server Error"
         })
     }
 }
@@ -826,7 +836,7 @@ export const deleteVehicle = async (req, res) => {
         console.log(vehicle);
         return res.status(200).json({
             message: "Vehicle Deleted Successfully",
-            data : vehicle
+            data: vehicle
         })
     } catch (error) {
         console.log("ERROR IN DELETING VEHICLE");

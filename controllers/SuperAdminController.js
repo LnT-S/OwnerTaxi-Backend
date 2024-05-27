@@ -6,12 +6,17 @@ import Wallet from '../models/Wallet.js'
 
 export const addDocumentList = async (req, res) => {
     console.log("/add-document-to-list", req.user)
-    const { documentFor, documentName , required,autoGenerateNo } = req.body
+    const { documentFor, documentName , required,autoGenerateNo,locality } = req.body
     console.log(req.body)
 
     if (!documentFor && !documentName) {
         return res.status(400).json({
             message: 'Enter Complete Info'
+        })
+    }
+    if(documentFor==='Vehicle' && !(locality==='Permit' || locality==='Private')){
+        return res.status(400).json({
+            message : "Vehicle Type is required and should be Private or Permit"
         })
     }
 
@@ -30,7 +35,7 @@ export const addDocumentList = async (req, res) => {
         console.log("LIST ", list)
         if (list === null) {
             let obj = {
-                documentFor, documentName , required, autoGenerateNo
+                documentFor, documentName , required, autoGenerateNo,locality
             }
             let newList = await Requirement.findOneAndUpdate({ id: req.user._id }, {
                 $push: { documentsList: obj }

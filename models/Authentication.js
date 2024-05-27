@@ -58,6 +58,10 @@ const authenticationSchema = new mongoose.Schema(
         subType: {
           type: String,
         },
+        locality: {
+          type: String,
+          enum : ['Permit','Private']
+        },
         capacity: {
           type: Number,
         },

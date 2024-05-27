@@ -14,6 +14,10 @@ const requirementSchema = new mongoose.Schema({
             documentName: {
                 type: String,
             },
+            locality: {
+                type: String,
+                enum : ['Private', 'Permit']
+            },
             required: {
                 type: Boolean,
                 default: false
